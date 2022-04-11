@@ -18,9 +18,9 @@ exports.createUser = async (req, res) => {
   });
   try {
     const data = await user.save();
-    // const token = await user.generateAuthToken();
+    const token = await user.generateAuthToken();
     const userData = user;
-    const email = await sendEmail(userData);
+    const email = await sendEmail(userData,token);
 
     res.status(200).send({
       message: email,
@@ -30,7 +30,7 @@ exports.createUser = async (req, res) => {
     console.log(userData);
   } catch (error) {
     console.log(error.message);
-    res.status(400).send({message:"sigup failed, try again!!!"},error.message);
+    res.status(400).send({message:"signup failed, try again!!!"},error.message);
   }
 };
 exports.loginUser = async (req, res, next) => {
@@ -142,7 +142,7 @@ exports.forgetPassword = (req, res) => {
         email: email,
         subject: "Reset your password",
         html: `<p>Dear User, you  requested a password reset to restore access to your account.</p> <br> <a href=${process.env.FRONTEND_URL}/userRoute/reset-password?token=${restoken}><b>Reset password Link</b></a>`,
-        name: "Welcome to My Books, Click on the link below to reset  your Password",
+        name: "Welcome to Smart City, Click on the link below to reset  your Password",
         body: `<a href=${process.env.FRONTEND_URL}/userRoute/verification?token=${restoken}>Link</a>`,
       };
       const userData = {

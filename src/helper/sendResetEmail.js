@@ -7,7 +7,7 @@ sgMail.setApiKey(process.env.ATTEND_KEY_SENDGRIND)
 const sendEmail = async (info,restoken) => {
 
     const mailOption = {
-        from: `"My Books"<${process.env.EMAIL}>`,
+        from: `"Smart City Application"<${process.env.EMAIL}>`,
         to: info.email,
         subject: "Dear User Thank you Resetting",
         html: emailTemplate(info,restoken)
