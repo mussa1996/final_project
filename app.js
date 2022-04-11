@@ -2,7 +2,7 @@ import express from "express";
 import bodyParser from "body-parser";
 import connectDb from './src/database/dbconnection';
 import cors from "cors";
-// import routes from './src/routers/index';
+import routes from './src/routers/index';
 
 const app = express();
 connectDb(); 
@@ -15,7 +15,7 @@ app.use(bodyParser.json());
 app.use(cors(corsOptions));
 app.use(bodyParser.urlencoded({ extended: false }));
 
-// app.use('/api/v1/smart/');
+app.use('/api/v1/smart/', routes);
 app.get("/",(req, res) => {
   res.send("Smart City Project");
 });  
