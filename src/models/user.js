@@ -4,27 +4,27 @@ import bcrypt from "bcryptjs";
 import validator from "validator";
 require("dotenv").config();
 const userSchema = new mongoose.Schema({
-  businessName: {
+  business_name: {
     type: String,
     required: true,
     trim: true,
     minlength: 3,
     maxlength: 50,
   },
-  ownerName: {
+  owner_name: {
     type: String,
     required: true,
     trim: true,
     minlength: 3,
     maxlength: 50,
   },
-  phoneNumber: {
+  phone: {
     type: String,
     required: true,
     trim: true,
     minlength: 10,
   },
-  businessType: {
+  business_type: {
     type: String,
     required: true,
     trim: true,
@@ -108,4 +108,3 @@ userSchema.pre('save', async function(next){
 })
 const User= mongoose.model('user',userSchema)
 module.exports = User;
-

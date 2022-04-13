@@ -4,7 +4,7 @@ module.exports={
             return next();
         }
         req.flash("error_msg",'Please log in first!');
-        res.redirect('/api/v1/smart/user/login');
+        res.redirect('/api/user/login');
     },
    forwardAuthenticated:function (req,res,next) {
        if(!req.isAuthenticated()){

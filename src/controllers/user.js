@@ -7,11 +7,11 @@ const _ = require("lodash");
 require("dotenv").config();
 exports.createUser = async (req, res) => {
   const user = new User({
-    businessName: req.body.businessName,
-    ownerName: req.body.ownerName,
+    business_name: req.body.business_name,
+    owner_name: req.body.owner_name,
     address: req.body.address,
-    businessType: req.body.businessType,
-    phoneNumber: req.body.phoneNumber,
+    business_type: req.body.business_type,
+    phone: req.body.phone,
     email: req.body.email,
     password: req.body.password,
     // role: req.body.role,
@@ -33,36 +33,37 @@ exports.createUser = async (req, res) => {
     res.status(400).send({message:"signup failed, try again!!!"},error.message);
   }
 };
-exports.loginUser = async (req, res, next) => {
+
+exports.loginUser = async (req, res) => {
   try {
     const user = await User.findByCredentials(
       req.body.email,
       req.body.password
     );
-    
     const token = await user.generateAuthToken();
-    res.status(200).send({ message: "Login successfully", user });
-  } catch (error) {
-    res.status(404).send({ message: "Login failed, check your email and password try again" },error.message);
-  }
-  next();
-};
 
+    res.status(201).send({
+      message: "operation successful",
+      user,
+    });
+  } catch (error) {
+    res.status(404).send(error.message);
+  }
+};
 
 exports.updateUser = async(req,res)=>{
   const user = new User({
       _id:req.query.id,
-      businessName: req.body.businessName,
-      ownerName: req.body.ownerName,
+      business_name: req.body.business_name,
+      owner_name: req.body.owner_name,
       address: req.body.address,
-      businessType: req.body.businessType,
-      phoneNumber: req.body.phoneNumber,
-      email: req.body.email,
+      business_type: req.body.business_type,
+      phone: req.body.phone,
       password: req.body.password,
       // role: req.body.role,
   });
   User.updateOne({_id:req.query.id},user).then(()=>{
-       res.status(201).send({
+       res.status(200).send({
            message:'User updated successfully',
            user
        });
@@ -99,7 +100,7 @@ exports.logout = async(req,res)=>{
 exports.findOne = async (req, res) => {
     try {
       const user = await User.findById(req.query.id);
-      res.status(201).send({
+      res.status(200).send({
         message: "operation successful",
         user,
       });
@@ -110,7 +111,7 @@ exports.findOne = async (req, res) => {
   exports.deleteUser = async (req, res) => {
     try {
       await User.deleteOne({ _id: req.query.id });
-      return res.status(201).json("delete successfully");
+      return res.status(200).json("delete successfully");
     } catch (error) {
       return res.status(404).send({ message: "delete failed" },error.message);
     }
@@ -123,96 +124,93 @@ exports.findAll = async (req, res) => {
     });
   });
 };
-exports.forgetPassword = (req, res) => {
+
+exports.forgetPassword=(req,res)=>{
   try {
-    const { email } = req.body;
-    User.findOne({ email }, (err, user) => {
-      if (err || !user) {
-        return res
-          .status(400)
-          .json({ error: "user of this email does not exists" });
-      }
-
-      const restoken = jwt.sign({ _id: user._id }, process.env.SECRET_KEY, {
-        expiresIn: "20m",
-      });
-      req.token = restoken;
-      req.user = user;
-      const mailOption = {
-        email: email,
-        subject: "Reset your password",
-        html: `<p>Dear User, you  requested a password reset to restore access to your account.</p> <br> <a href=${process.env.FRONTEND_URL}/userRoute/reset-password?token=${restoken}><b>Reset password Link</b></a>`,
-        name: "Welcome to Smart City, Click on the link below to reset  your Password",
-        body: `<a href=${process.env.FRONTEND_URL}/userRoute/verification?token=${restoken}>Link</a>`,
-      };
-      const userData = {
-        user,
-        resentLink: restoken,
-      };
-      console.log(userData);
-      // // user.resentLink=token
-
-      return User.updateOne({ _id: user._id }, userData, (err, success) => {
-        if (err) {
-          return res.status(400).json({ error: err });
-        } else {
-          // console.log(transport)
-          const sendmail = sendResetEmail(mailOption, restoken);
-          if (sendmail) {
-            return res
-              .status(200)
-              .json({
-                message: "Email has been sent, kindly follow the instructions",
-                userData,
-              });
+      const {email}=req.body;
+      User.findOne({email},(err,user)=>{
+          if(err || !user){
+return res.status(400).json({error:"user of this email does not exists"})
           }
-        }
-      });
-    });
+          
+          const restoken=jwt.sign({_id: user._id},process.env.SECRET_KEY,{expiresIn:'20m'});
+          req.token = restoken
+          req.user = user
+  const mailOption= {
+          email: email,
+          subject: 'Reset your password',
+          html: `<p>Dear User, you  requested a password reset to restore access to your account.</p> <br> <a href=${process.env.FRONTEND_URL}/userRoute/reset-password?token=${restoken}><b>Reset password Link</b></a>`,
+          name: 'Welcome to Smart City, Click on the link below to reset  your Password',
+          body:`<a href=${process.env.FRONTEND_URL}/userRoute/verification?token=${restoken}>Link</a>`
+        };
+  const userData={
+      user,
+      resentLink:restoken
+  }
+  console.log(userData)
+  // // user.resentLink=token
+ 
+  return User.updateOne({_id: user._id},userData, (err,success)=>{
+      if(err){
+          return res.status(400).json({error:err})
+                      }
+                      else{
+                          // console.log(transport)
+                          const sendmail =sendResetEmail(mailOption,restoken);
+                              if(sendmail){
+                                  return res.status(200).json({message:'Email has been sent, kindly follow the instructions',userData});
+                              }
+                             
+                          
+                       
+                      }
+  })
+      })
   } catch (error) {
-    return res.status(500).json(error.message);
+  
+      return res.status(500).json(error.message)
   }
-};
-exports.resetPassword = (req, res) => {
-  const { resentLink, newPassword } = req.body;
-  if (resentLink) {
-    jwt.verify(
-      resentLink,
-      process.env.SECRET_KEY,
-      function (error, decodedToken) {
-        if (error) {
-          return res.json({
-            error: "incorrect token or it is expired",
-          });
-        }
-        User.findOne({ resentLink }, (err, user) => {
-          if (err || !user) {
-            return res
-              .status(400)
-              .json({ error: " user of this token does not exists" });
-          }
-          const obj = {
-            ...user,
-            password: newPassword,
-          };
-          user = _.extend(user, obj);
-          // res.json({user})
-          user.save((err, result) => {
-            if (result) {
-              return res
-                .status(200)
-                .json({ message: "Your password has been changed" });
-            } else {
-              return res.status(400).json({ error: "reset password error" });
-            }
-          });
-        });
+}
+exports.resetPassword=(req,res)=>{
+      const{resentLink,newPassword}=req.body;
+      if(resentLink){
+          jwt.verify(resentLink,process.env.SECRET_KEY,function(error,decodedToken){
+              if(error){
+                  return res.json({
+                      error:"incorrect token or it is expired"
+                  })
+              }
+              User.findOne({resentLink},(err,user)=>{
+                  if(err || !user){
+                      return res.status(400).json({error:' user of this token does not exists'})
+                  }
+                  const obj={
+                      ...user,
+                      password:newPassword
+                  }
+                  user=_.extend(user,obj);
+                  // res.json({user})
+                  user.save((err,result)=>{
+                      if(result){
+                          return res.status(200).json({message:'Your password has been changed'});
+                          
+                                      }
+                                      else{
+                                          
+                                          return res.status(400).json({error:"reset password error"}) 
+                                          
+                                       
+                                      }
+                  })
+              })
+          })
       }
-    );
-  } else {
-    return res.status(400).json({ error: "Authentication Error" });
-  }
-};
+      else{
+          return res.status(400).json({error:'Authentication Error'})
+      }
+}
+
+
 exports.verify = async (req, res) => {
   const token = req.query.token;
   const id = jwt.verify(token, process.env.SECRET_KEY);

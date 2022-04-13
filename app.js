@@ -15,7 +15,7 @@ app.use(bodyParser.json());
 app.use(cors(corsOptions));
 app.use(bodyParser.urlencoded({ extended: false }));
 
-app.use('/api/v1/smart/', routes);
+app.use('/api', routes);
 app.get("/",(req, res) => {
   res.send("Smart City Project");
 });  
