@@ -11,5 +11,5 @@ route.get('/getOne/', userAuth,userController.findOne)
 route.put('/update/', userAuth,userController.updateUser)
 route.delete('/delete/', userAuth,userController.deleteUser)
 route.post('/forgetpassword',userController.forgetPassword)
-route.post('/resetPassword',userController.resetPassword)
+route.put('/resetPassword',userController.resetPassword)
 module.exports=route

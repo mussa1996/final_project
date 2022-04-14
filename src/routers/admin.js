@@ -8,3 +8,4 @@ route.get('/getAll',adminAuth,userController.findAll)
 route.get('/getOne/',adminAuth,userController.findOne)
 route.delete('/delete/',adminAuth,userController.deleteUser)
 module.exports=route
+ 

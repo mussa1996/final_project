@@ -1,7 +1,7 @@
 import User from "../models/user";
 import sendEmail from "../helper/sendEmail";
 import sendResetEmail from "../helper/sendResetEmail";
-// import bcrypt from 'bcryptjs'
+import bcrypt from 'bcryptjs'
 import jwt from "jsonwebtoken";
 const _ = require("lodash");
 require("dotenv").config();
@@ -45,6 +45,7 @@ exports.loginUser = async (req, res) => {
     res.status(201).send({
       message: "operation successful",
       user,
+      token,
     });
   } catch (error) {
     res.status(404).send(error.message);
@@ -98,7 +99,7 @@ exports.logout = async(req,res)=>{
   }
 }
 exports.findOne = async (req, res) => {
-    try {
+    try { 
       const user = await User.findById(req.query.id);
       res.status(200).send({
         message: "operation successful",
@@ -125,92 +126,49 @@ exports.findAll = async (req, res) => {
   });
 };
 
-exports.forgetPassword=(req,res)=>{
+
+exports.forgetPassword= async (req,res)=>{
   try {
       const {email}=req.body;
-      User.findOne({email},(err,user)=>{
+      await User.findOne({email},async (err,user)=>{
           if(err || !user){
-return res.status(400).json({error:"user of this email does not exists"})
+              return res.status(400).json({error:"user of this email does not exists"})
           }
-          
-          const restoken=jwt.sign({_id: user._id},process.env.SECRET_KEY,{expiresIn:'20m'});
-          req.token = restoken
-          req.user = user
-  const mailOption= {
-          email: email,
-          subject: 'Reset your password',
-          html: `<p>Dear User, you  requested a password reset to restore access to your account.</p> <br> <a href=${process.env.FRONTEND_URL}/userRoute/reset-password?token=${restoken}><b>Reset password Link</b></a>`,
-          name: 'Welcome to Smart City, Click on the link below to reset  your Password',
-          body:`<a href=${process.env.FRONTEND_URL}/userRoute/verification?token=${restoken}>Link</a>`
-        };
-  const userData={
-      user,
-      resentLink:restoken
-  }
-  console.log(userData)
-  // // user.resentLink=token
- 
-  return User.updateOne({_id: user._id},userData, (err,success)=>{
-      if(err){
-          return res.status(400).json({error:err})
-                      }
-                      else{
-                          // console.log(transport)
-                          const sendmail =sendResetEmail(mailOption,restoken);
-                              if(sendmail){
-                                  return res.status(200).json({message:'Email has been sent, kindly follow the instructions',userData});
-                              }
-                             
-                          
-                       
-                      }
-  })
-      })
-  } catch (error) {
-  
-      return res.status(500).json(error.message)
-  }
-}
-exports.resetPassword=(req,res)=>{
-      const{resentLink,newPassword}=req.body;
-      if(resentLink){
-          jwt.verify(resentLink,process.env.SECRET_KEY,function(error,decodedToken){
-              if(error){
-                  return res.json({
-                      error:"incorrect token or it is expired"
-                  })
-              }
-              User.findOne({resentLink},(err,user)=>{
-                  if(err || !user){
-                      return res.status(400).json({error:' user of this token does not exists'})
-                  }
-                  const obj={
-                      ...user,
-                      password:newPassword
-                  }
-                  user=_.extend(user,obj);
-                  // res.json({user})
-                  user.save((err,result)=>{
-                      if(result){
-                          return res.status(200).json({message:'Your password has been changed'});
-                          
-                                      }
-                                      else{
-                                          
-                                          return res.status(400).json({error:"reset password error"}) 
-                                          
-                                       
-                                      }
-                  })
-              })
+          const userInfo = {
+              token:jwt.sign({_id: user._id},process.env.SECRET_KEY,{expiresIn:'20m'}),
+              email:user.email
+          }
+          await sendEmail(userInfo,'forgotPassword').then(()=>{
+              console.log('Email sent successfully',userInfo)
+          }).catch((err)=>{
+              console.log(err)
           })
-      }
-      else{
-          return res.status(400).json({error:'Authentication Error'})
-      }
+          return res.status(200).send({message:'Token Sent Successfully',userInfo})
+      }).clone()
+  } catch (error) {
+      return res.status(500).send(error.message)
+  }
 }
 
+exports.resetPassword=async (req,res)=>{
+  try{
+      const{token,newPassword}=req.body;
+      if(token){
+          const data = await jwt.verify(token,process.env.SECRET_KEY)
+          const userInfo = await User.findOne({_id:data._id.toString()})
+          if(!userInfo) return res.status('404').send({message:"User not found"})
+          const newHashedPassword = await bcrypt.hash(newPassword, 8);
+          await User.findByIdAndUpdate(userInfo._id,{password:newHashedPassword}).catch((err)=>{return res.status(403).send({message:'failed to update'})})
+          return res.status('201').send({message:'Password changed successfully'})
+      }else{
+          return res.status('404').send({message:"User not found"})
+      }
+  }catch(error){
+      return res.status(500).send(error.message)
+  } 
+}
 
+ 
 exports.verify = async (req, res) => {
   const token = req.query.token;
   const id = jwt.verify(token, process.env.SECRET_KEY);
