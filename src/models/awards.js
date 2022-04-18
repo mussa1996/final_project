@@ -27,6 +27,11 @@ const awardsSchema = new mongoose.Schema({
         minlength: 1,
         maxlength: 100,
       },
+      business_id: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "business",
+        required: true,
+      },
 });
 const Awards=mongoose.model("awards",awardsSchema);
 export default Awards;

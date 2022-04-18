@@ -1,30 +1,16 @@
 import Product from "../models/product";
+import uploader from "../helper/storage";
 exports.create = async (req, res) => {
   try {
+    const images=req.files.photo;
+    const response=await uploader(images.tempFilePath)
+    console.log("images path",response)
     const product = new Product({
       name: req.body.name,
-      rating: req.body.rating,
       price: req.body.price,
       price_level: req.body.price_level,
-      rankings: req.body.rankings,
-      address: req.body.address,
-      phone: req.body.phone,
-      website: req.body.website,
-      timezone: req.body.timezone,
-      latitude: req.body.latitude,
-      longitude: req.body.longitude,
-      class_type: req.body.class_type,
-      num_reviews: req.body.num_reviews,
-      email: req.body.email,
-      description: req.body.description,
-      awards: req.body.awards,
-      address_obj: req.body.address_obj,
-      category: req.body.category,
-      internal_services: req.body.internal_services,
-      hours: req.body.hours,
-      photo: req.body.photo,
-      subcategory: req.body.subcategory,
-      subtype: req.body.subtype
+      photo:response.secure_url,
+      business_id: req.business._id,
     });
 
     const details = await product.save();
@@ -37,25 +23,25 @@ exports.create = async (req, res) => {
   }
 };
 exports.getProduct = async (req, res) => {
-  await Product.find().then((pro) => {
+  await Product.find().then((product) => {
     res.send({
       message: "Products found are:",
-      pro,
+      product,
     });
   });
 };
 
 exports.getOneProduct = async (req, res, next) => {
   try {
-    const cust = await Product.findOne({ _id: req.query.id });
-    if (!cust) {
+    const product = await Product.findOne({ _id: req.query.id });
+    if (!product) {
       res.status(404).send({
         message: "Product not found",
       });
     }
     res.send({
       message: "Product found is:",
-      cust,
+      product,
     });
   } catch (error) {
     res.status(500).send(error.message);
@@ -63,8 +49,8 @@ exports.getOneProduct = async (req, res, next) => {
 };
 exports.deleteProduct = async (req, res) => {
   try {
-    const cust = await Product.findOne({ _id: req.query.id });
-    if (!cust) {
+    const product = await Product.findOne({ _id: req.query.id });
+    if (!product) {
       res.send({
         message: "Product not found",
       });
@@ -73,7 +59,7 @@ exports.deleteProduct = async (req, res) => {
     await Product.deleteOne({ _id: req.query.id });
     res.send({
       message: " Product deleted successful",
-      cust: cust,
+      product: product,
     });
   } catch (error) {
     res.status(404).send(error.message);
@@ -81,31 +67,15 @@ exports.deleteProduct = async (req, res) => {
 };
 
 exports.updateProduct = async (req, res) => {
+  const images=req.files.photo;
+  const response=await uploader(images.tempFilePath)
+  console.log("images path",response)
   const product = new Product({
     _id: req.query.id,
     name: req.body.name,
-    rating: req.body.rating,
     price: req.body.price,
     price_level: req.body.price_level,
-    rankings: req.body.rankings,
-    address: req.body.address,
-    phone: req.body.phone,
-    website: req.body.website,
-    timezone: req.body.timezone,
-    latitude: req.body.latitude,
-    longitude: req.body.longitude,
-    class_type: req.body.class_type,
-    num_reviews: req.body.num_reviews,
-    email: req.body.email,
-    description: req.body.description,
-    awards: req.body.awards,
-    address_obj: req.body.address_obj,
-    category: req.body.category,
-    internal_services: req.body.internal_services,
-    hours: req.body.hours,
-    photo: req.body.photo,
-    subcategory: req.body.subcategory,
-    subtype: req.body.subtype
+    photo:response.secure_url,
   });
 
   Product.updateOne({ _id: req.query.id }, product)

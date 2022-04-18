@@ -3,7 +3,7 @@ exports.create = async (req, res) => {
   try {
     const internal_services = new Internal_services({
       name: req.body.name,
-      key: req.body.key,
+      business_id: req.business._id,
       
     });
 
@@ -17,25 +17,25 @@ exports.create = async (req, res) => {
   }
 };
 exports.getinternal_services = async (req, res) => {
-  await Internal_services.find().then((pro) => {
+  await Internal_services.find().then((service) => {
     res.send({
       message: "internal_services found are:",
-      pro,
+      service,
     });
   });
 };
 
 exports.getOneinternal_services = async (req, res, next) => {
   try {
-    const cust = await Internal_services.findOne({ _id: req.query.id });
-    if (!cust) {
+    const service = await Internal_services.findOne({ _id: req.query.id });
+    if (!service) {
       res.status(404).send({
         message: "internal_services not found",
       });
     }
     res.send({
       message: "internal_services found is:",
-      cust,
+      service,
     });
   } catch (error) {
     res.status(500).send(error.message);
@@ -43,8 +43,8 @@ exports.getOneinternal_services = async (req, res, next) => {
 };
 exports.deleteinternal_services = async (req, res) => {
   try {
-    const cust = await Internal_services.findOne({ _id: req.query.id });
-    if (!cust) {
+    const service = await Internal_services.findOne({ _id: req.query.id });
+    if (!service) {
       res.send({
         message: "internal_services not found",
       });
@@ -53,7 +53,7 @@ exports.deleteinternal_services = async (req, res) => {
     await Internal_services.deleteOne({ _id: req.query.id });
     res.send({
       message: " internal_services deleted successful",
-      cust: cust,
+      service: service,
     });
   } catch (error) {
     res.status(404).send(error.message);
@@ -64,7 +64,6 @@ exports.updateinternal_services = async (req, res) => {
   const internal_services = new Internal_services({
     _id: req.query.id,
     name: req.body.name,
-    key: req.body.key,
     
   });
   Internal_services.updateOne({ _id: req.query.id }, internal_services)

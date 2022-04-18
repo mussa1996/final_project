@@ -3,7 +3,7 @@ import jwt from "jsonwebtoken";
 import bcrypt from "bcryptjs";
 import validator from "validator";
 require("dotenv").config();
-const userSchema = new mongoose.Schema({
+const businessSchema = new mongoose.Schema({
   business_name: {
     type: String,
     required: true,
@@ -24,7 +24,7 @@ const userSchema = new mongoose.Schema({
     trim: true,
     minlength: 10,
   },
-  business_type: {
+  category: {
     type: String,
     required: true,
     trim: true,
@@ -52,6 +52,23 @@ const userSchema = new mongoose.Schema({
     trim: true,
     minlength: 6,
   },
+  photo: {
+    type: String,
+    required: false,
+  },
+  website: {
+    type: String,
+    required: true,
+  },
+  latitude: {
+    type: String,
+    required: true,
+  },
+  longitude: {
+    type: String,
+    required: true,
+  },
+  
   isVerified: {
     type: Boolean,
     default: false,
@@ -61,11 +78,7 @@ const userSchema = new mongoose.Schema({
     type: String,
   },
 
- 
-  profileImage: {
-    type: String,
-    default: "default.jpg",
-  },
+  
   role: {
     type: String,
     required: true,
@@ -73,38 +86,38 @@ const userSchema = new mongoose.Schema({
   },
 });
 //generating auth token
-userSchema.methods.generateAuthToken = async function(){
-  const user=this
- const token = jwt.sign({_id:user._id.toString(),role:user.role},process.env.SECRET_KEY,{expiresIn:'50m'})
+businessSchema.methods.generateAuthToken = async function(){
+  const business=this
+ const token = jwt.sign({_id:business._id.toString(),role:business.role},process.env.SECRET_KEY,{expiresIn:'50m'})
 
-  user.token = token
-  await user.save();
+  business.token = token
+  await business.save();
   return token
 }
 //find if email and password are exists
-userSchema.statics.findByCredentials = async(email,password)=>{
-  const user = await User.findOne({email})
-  //console.log(user)
-   if(!user){
+businessSchema.statics.findByCredentials = async(email,password)=>{
+  const business = await Business.findOne({email})
+  //console.log(business)
+   if(!business){
        throw new Error('unable to login')
    }
-   if(user.isVerified ===false){
+   if(business.isVerified ===false){
        throw new Error('Account not verified')
    }
-   const isMatch = await bcrypt.compare(password,user.password)
+   const isMatch = await bcrypt.compare(password,business.password)
   
    if(!isMatch){
        throw new Error("password or email is incorrect")
    }
-   return user
+   return business
 } 
 //hash the plain text password
-userSchema.pre('save', async function(next){
- const user = this
- if(user.isModified('password')){
-     user.password = await bcrypt.hash(user.password, 8)
+businessSchema.pre('save', async function(next){
+ const business = this
+ if(business.isModified('password')){
+     business.password = await bcrypt.hash(business.password, 8)
  }
  next() 
 })
-const User= mongoose.model('user',userSchema)
-module.exports = User;
+const Business= mongoose.model('business',businessSchema)
+module.exports = Business;

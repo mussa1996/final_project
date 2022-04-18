@@ -4,12 +4,12 @@ module.exports={
             return next();
         }
         req.flash("error_msg",'Please log in first!');
-        res.redirect('/api/user/login');
+        res.redirect('/api/business/login');
     },
    forwardAuthenticated:function (req,res,next) {
        if(!req.isAuthenticated()){
            return next()
        }
-       res.send('User is logged in');
+       res.send('Business is logged in');
    }
 };

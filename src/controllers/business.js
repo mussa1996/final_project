@@ -1,33 +1,41 @@
-import User from "../models/user";
+import Business from "../models/business";
 import sendEmail from "../helper/sendEmail";
 import sendResetEmail from "../helper/sendResetEmail";
 import bcrypt from 'bcryptjs'
 import jwt from "jsonwebtoken";
+import uploader from "../helper/storage";
 const _ = require("lodash");
 require("dotenv").config();
 exports.createUser = async (req, res) => {
-  const user = new User({
+  const images=req.files.photo;
+  const response=await uploader(images.tempFilePath)
+  console.log("images path",response)
+  const business = new Business({
     business_name: req.body.business_name,
     owner_name: req.body.owner_name,
     address: req.body.address,
-    business_type: req.body.business_type,
+    category: req.body.category,
     phone: req.body.phone,
     email: req.body.email,
     password: req.body.password,
+    photo:response.secure_url,
+    website:req.body.website,
+    latitude:req.body.latitude,
+    longitude:req.body.longitude,
     // role: req.body.role,
   });
   try {
-    const data = await user.save();
-    const token = await user.generateAuthToken();
-    const userData = user;
-    const email = await sendEmail(userData,token);
+    const data = await business.save();
+    const token = await business.generateAuthToken();
+    const businessData = business;
+    const email = await sendEmail(businessData,token);
 
     res.status(200).send({
       message: email,
       user: data,
       token: token,
     });
-    console.log(userData);
+    console.log(businessData);
   } catch (error) {
     console.log(error.message);
     res.status(400).send({message:"signup failed, try again!!!"},error.message);
@@ -36,15 +44,15 @@ exports.createUser = async (req, res) => {
 
 exports.loginUser = async (req, res) => {
   try {
-    const user = await User.findByCredentials(
+    const business = await Business.findByCredentials(
       req.body.email,
       req.body.password
     );
-    const token = await user.generateAuthToken();
+    const token = await business.generateAuthToken();
 
     res.status(201).send({
       message: "operation successful",
-      user,
+      business,
       token,
     });
   } catch (error) {
@@ -53,20 +61,28 @@ exports.loginUser = async (req, res) => {
 };
 
 exports.updateUser = async(req,res)=>{
-  const user = new User({
-      _id:req.query.id,
-      business_name: req.body.business_name,
-      owner_name: req.body.owner_name,
-      address: req.body.address,
-      business_type: req.body.business_type,
-      phone: req.body.phone,
-      password: req.body.password,
-      // role: req.body.role,
+  const images=req.files.photo;
+  const response=await uploader(images.tempFilePath)
+  console.log("images path",response)
+  const business = new Business({
+    _id:req.query.id,
+    business_name: req.body.business_name,
+    owner_name: req.body.owner_name,
+    address: req.body.address,
+    category: req.body.category,
+    phone: req.body.phone,
+    email: req.body.email,
+    password: req.body.password,
+    photo:response.secure_url,
+    website:req.body.website,
+    latitude:req.body.latitude,
+    longitude:req.body.longitude,
+    // role: req.body.role,
   });
-  User.updateOne({_id:req.query.id},user).then(()=>{
+  Business.updateOne({_id:req.query.id},business).then(()=>{
        res.status(200).send({
            message:'User updated successfully',
-           user
+           business
        });
   }).catch((error)=>{
       res.json({
@@ -78,20 +94,20 @@ exports.updateUser = async(req,res)=>{
 exports.logout = async(req,res)=>{
   try {
       const {token}=req;
-      const userId=req.user._id.toString()
-      const users = await User.findOne({_id:userId}).catch((error) => {
+      const businessId=req.business._id.toString()
+      const business = await Business.findOne({_id:businessId}).catch((error) => {
           return res.status(400).json({
               error: error,
               
           });
       })
-      if(users.token !== token){
+      if(business.token !== token){
         return  res.status(404).send({
           message: 'Token not found',
       })
       }
 
-      await User.findByIdAndUpdate(req.user._id,{token:null})
+      await Business.findByIdAndUpdate(req.business._id,{token:null})
       res.status(200).send({ message: "Logout successful!" });
           
   } catch (error) {
@@ -100,10 +116,10 @@ exports.logout = async(req,res)=>{
 }
 exports.findOne = async (req, res) => {
     try { 
-      const user = await User.findById(req.query.id);
+      const business = await Business.findById(req.query.id);
       res.status(200).send({
         message: "operation successful",
-        user,
+        business,
       });
     } catch (error) {
       res.status(404).send(error.message);
@@ -111,16 +127,16 @@ exports.findOne = async (req, res) => {
   };
   exports.deleteUser = async (req, res) => {
     try {
-      await User.deleteOne({ _id: req.query.id });
+      await Business.deleteOne({ _id: req.query.id });
       return res.status(200).json("delete successfully");
     } catch (error) {
       return res.status(404).send({ message: "delete failed" },error.message);
     }
   };
 exports.findAll = async (req, res) => {
-  await User.find().then((data) => {
+  await Business.find().then((data) => {
     res.status(200).send({
-      message: "Users found are:",
+      message: "business found are:",
       data,
     });
   });
@@ -130,20 +146,20 @@ exports.findAll = async (req, res) => {
 exports.forgetPassword= async (req,res)=>{
   try {
       const {email}=req.body;
-      await User.findOne({email},async (err,user)=>{
-          if(err || !user){
-              return res.status(400).json({error:"user of this email does not exists"})
+      await Business.findOne({email},async (err,business)=>{
+          if(err || !business){
+              return res.status(400).json({error:"business of this email does not exists"})
           }
-          const userInfo = {
-              token:jwt.sign({_id: user._id},process.env.SECRET_KEY,{expiresIn:'20m'}),
-              email:user.email
+          const businessInfo = {
+              token:jwt.sign({_id: business._id},process.env.SECRET_KEY,{expiresIn:'20m'}),
+              email:business.email
           }
-          await sendEmail(userInfo,'forgotPassword').then(()=>{
-              console.log('Email sent successfully',userInfo)
+          await sendResetEmail(businessInfo,'forgotPassword').then(()=>{
+              console.log('Email sent successfully',businessInfo)
           }).catch((err)=>{
               console.log(err)
           })
-          return res.status(200).send({message:'Token Sent Successfully',userInfo})
+          return res.status(200).send({message:'Token Sent Successfully',businessInfo})
       }).clone()
   } catch (error) {
       return res.status(500).send(error.message)
@@ -155,13 +171,13 @@ exports.resetPassword=async (req,res)=>{
       const{token,newPassword}=req.body;
       if(token){
           const data = await jwt.verify(token,process.env.SECRET_KEY)
-          const userInfo = await User.findOne({_id:data._id.toString()})
-          if(!userInfo) return res.status('404').send({message:"User not found"})
+          const businessInfo = await Business.findOne({_id:data._id.toString()})
+          if(!businessInfo) return res.status('404').send({message:"User not found"})
           const newHashedPassword = await bcrypt.hash(newPassword, 8);
-          await User.findByIdAndUpdate(userInfo._id,{password:newHashedPassword}).catch((err)=>{return res.status(403).send({message:'failed to update'})})
+          await Business.findByIdAndUpdate(businessInfo._id,{password:newHashedPassword}).catch((err)=>{return res.status(403).send({message:'failed to update'})})
           return res.status('201').send({message:'Password changed successfully'})
       }else{
-          return res.status('404').send({message:"User not found"})
+          return res.status('404').send({message:"Business not found"})
       }
   }catch(error){
       return res.status(500).send(error.message)
@@ -172,12 +188,12 @@ exports.resetPassword=async (req,res)=>{
 exports.verify = async (req, res) => {
   const token = req.query.token;
   const id = jwt.verify(token, process.env.SECRET_KEY);
-  const userExist = await User.findOne({ _id: id });
-  if (!userExist)
-    return res.status(404).json({ message: "User could not be found" });
-  if (userExist.isVerified === true)
-    return res.status(200).json({ message: "The user is verified" });
-  const verifiedAccount = await User.updateOne(
+  const businessExit = await Business.findOne({ _id: id });
+  if (!businessExit)
+    return res.status(404).json({ message: "Business could not be found" });
+  if (businessExit.isVerified === true)
+    return res.status(200).json({ message: "The business is verified" });
+  const verifiedAccount = await Business.updateOne(
     { _id: id },
     { isVerified: true }
   );

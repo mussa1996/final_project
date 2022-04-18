@@ -1,15 +1,15 @@
-import userController from '../controllers/user';
+import businessController from '../controllers/business';
 import { userAuth} from '../middlewares/auth'
 import express from 'express'
 const route=express.Router()
-route.post('/signup',userController.createUser)
-route.put('/verify/',userController.verify)
-route.post('/login',userController.loginUser)
-route.post('/logout', userAuth,userController.logout)
-// route.get('/getAll',userController.findAll)
-route.get('/getOne/', userAuth,userController.findOne)
-route.put('/update/', userAuth,userController.updateUser)
-route.delete('/delete/', userAuth,userController.deleteUser)
-route.post('/forgetpassword',userController.forgetPassword)
-route.put('/resetPassword',userController.resetPassword)
+route.post('/signup',businessController.createUser)
+route.put('/verify/',businessController.verify)
+route.post('/login',businessController.loginUser)
+route.post('/logout', userAuth,businessController.logout)
+// route.get('/getAll',businessController.findAll)
+route.get('/getOne/', userAuth,businessController.findOne)
+route.put('/update/', userAuth,businessController.updateUser)
+route.delete('/delete/', userAuth,businessController.deleteUser)
+route.post('/forgetpassword',businessController.forgetPassword)
+route.put('/resetPassword',businessController.resetPassword)
 module.exports=route

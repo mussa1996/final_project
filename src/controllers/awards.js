@@ -10,6 +10,7 @@ exports.create = async (req, res) => {
           display_name: req.body.display_name,
           images:response.secure_url,
           year: req.body.year,
+          business_id: req.business._id,
      
       
     });
@@ -23,25 +24,25 @@ exports.create = async (req, res) => {
   }
 };
 exports.getawards = async (req, res) => {
-  await Awards.find().then((pro) => {
+  await Awards.find().then((award) => {
     res.send({
-      message: "awardss found are:",
-      pro,
+      message: "awards found are:",
+      award,
     });
   });
 };
 
 exports.getOneawards = async (req, res, next) => {
   try {
-    const cust = await Awards.findOne({ _id: req.query.id });
-    if (!cust) {
+    const award = await Awards.findOne({ _id: req.query.id });
+    if (!award) {
       res.status(404).send({
         message: "awards not found",
       });
     }
     res.send({
       message: "awards found is:",
-      cust,
+      award,
     });
   } catch (error) {
     res.status(500).send(error.message);
@@ -49,8 +50,8 @@ exports.getOneawards = async (req, res, next) => {
 };
 exports.deleteawards = async (req, res) => {
   try {
-    const cust = await Awards.findOne({ _id: req.query.id });
-    if (!cust) {
+    const award = await Awards.findOne({ _id: req.query.id });
+    if (!award) {
       res.send({
         message: "awards not found",
       });
@@ -59,7 +60,7 @@ exports.deleteawards = async (req, res) => {
     await Awards.deleteOne({ _id: req.query.id });
     res.send({
       message: " awards deleted successful",
-      cust: cust,
+      award,
     });
   } catch (error) {
     res.status(404).send(error.message);
