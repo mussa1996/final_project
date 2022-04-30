@@ -7,4 +7,5 @@ route.get('/getAll',categoryContoller.getcategory)
 route.get('/getOne/',categoryContoller.getOnecategory)
 route.put('/update/',categoryContoller.updatecategory)
 route.delete('/delete/',categoryContoller.deletecategory)
+route.get('/count',categoryContoller.countCategory)
 module.exports=route

@@ -1,6 +1,6 @@
 import express from "express";
 const route=express.Router()
-import userRoute from './user'
+import userRoute from './business'
 import adminRoute from './admin'
 import productRoute from './product'
 import awardRoute from './awards'
@@ -12,4 +12,4 @@ route.use('/product',productRoute)
 route.use('/award',awardRoute)
 route.use('/category',categoryRoute)
 route.use('/service',serviceRoute)
-module.exports=route
+module.exports=route 

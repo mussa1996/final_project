@@ -77,3 +77,15 @@ exports.updatecategory = async (req, res) => {
       res.status(400).send(error.message);
     });
 };
+exports.countCategory = async (req,res) => {
+  
+  await Category.find().count().then((data)=>{
+    
+    res.status(200).send({
+      message: "Category found are:",
+      data,
+    });
+  } 
+  )   
+}   
+      

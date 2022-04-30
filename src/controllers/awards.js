@@ -12,7 +12,6 @@ exports.create = async (req, res) => {
           year: req.body.year,
           business_id: req.business._id,
      
-      
     });
     const details = await awards.save();
     res.send({
@@ -27,6 +26,16 @@ exports.getawards = async (req, res) => {
   await Awards.find().then((award) => {
     res.send({
       message: "awards found are:",
+      award,
+    });
+  });
+};
+exports.getAwardById = async (req, res) => {
+  await Awards.find({
+      business_id: req.query.business_id
+  }).then((award) => {
+    res.send({
+      message: "Award found are:",
       award,
     });
   });
@@ -68,7 +77,9 @@ exports.deleteawards = async (req, res) => {
 };
 
 exports.updateawards = async (req, res) => {
-  const images=req.files;
+
+  try {
+    const images=req.files.images;
   const response=await uploader(images.tempFilePath)
   console.log("images path",response)
   const awards = new Awards({
@@ -88,7 +99,34 @@ exports.updateawards = async (req, res) => {
         awards,
       });
     })
-    .catch((error) => {
-      res.status(400).send(error.message);
-    });
+    
+  } catch (error) {
+    res.status(400).send(error.message);
+  }
+      
+  
 };
+exports.countAward = async (req,res) => {
+  
+  await Awards.find().count().then((data)=>{
+    
+    res.status(200).send({
+      message: "Awards found are:",
+      data,
+    });
+  }
+  ) 
+}
+exports.CountAwardById = async(req, res) => {
+
+  await Awards.find({
+      business_id: req.query.business_id
+  }).count().then((data) => {
+
+      res.status(200).send({
+          message: "award found are:",
+          data,
+      });
+  })
+}
+

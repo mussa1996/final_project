@@ -1,10 +1,13 @@
 import awardController from '../controllers/awards';
-import { userAuth} from '../middlewares/auth'
+import { userAuth } from '../middlewares/auth'
 import express from 'express'
-const route=express.Router()
-route.post('/create',userAuth,awardController.create)
-route.get('/getAll',userAuth,awardController.getawards)
-route.get('/getOne/', userAuth,awardController.getOneawards)
-route.put('/update/', userAuth,awardController.updateawards)
-route.delete('/delete/', userAuth,awardController.deleteawards)
-module.exports=route
+const route = express.Router()
+route.post('/create',userAuth, awardController.create)
+route.get('/getAll', awardController.getawards)
+route.get('/getOne/', awardController.getOneawards)
+route.put('/update/',awardController.updateawards)
+route.delete('/delete/', awardController.deleteawards)
+route.get('/count', awardController.countAward)
+route.get('/countById',awardController.CountAwardById)
+route.get('/getAwardById/',awardController.getAwardById)
+module.exports = route

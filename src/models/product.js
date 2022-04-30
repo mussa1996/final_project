@@ -21,12 +21,19 @@ const productSchema = new mongoose.Schema({
     trim: true,
     minlength: 1,
     maxlength: 100,
-  },
+  }, 
   photo: {
     type: String,
     required: true,
   },
-  business_id: {
+  description:{
+    type: String,
+    required: true,
+    trim: true,
+    minlength: 1,
+    maxlength: 100,
+  },
+  business_id:{
     type: mongoose.Schema.Types.ObjectId,
     ref: "business",
     required: true,

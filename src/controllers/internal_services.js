@@ -11,7 +11,7 @@ exports.create = async (req, res) => {
     res.send({
       message: "internal_services saved successfully",
       data: details,
-    });
+    });  
   } catch (error) {
     res.status(500).send(error.message);
   }
@@ -25,6 +25,16 @@ exports.getinternal_services = async (req, res) => {
   });
 };
 
+exports.getServiceById = async (req, res) => {
+  await Internal_services.find({
+      business_id: req.query.business_id
+  }).then((service) => {
+    res.send({
+      message: "Services found are:",
+      service,
+    });
+  });
+};
 exports.getOneinternal_services = async (req, res, next) => {
   try {
     const service = await Internal_services.findOne({ _id: req.query.id });
@@ -77,3 +87,26 @@ exports.updateinternal_services = async (req, res) => {
       res.status(400).send(error.message);
     });
 };
+exports.countService = async (req,res) => {
+  
+  await Internal_services.find().count().then((data)=>{
+    
+    res.status(200).send({
+      message: "Internal service found are:",
+      data,
+    });
+  }
+  )
+}
+exports.CountServiceById = async(req, res) => {
+
+  await Internal_services.find({
+      business_id: req.query.business_id
+  }).count().then((data) => {
+
+      res.status(200).send({
+          message: "service found are:",
+          data,
+      });
+  })
+}

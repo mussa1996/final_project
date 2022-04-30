@@ -10,9 +10,10 @@ exports.create = async (req, res) => {
       price: req.body.price,
       price_level: req.body.price_level,
       photo:response.secure_url,
+      description: req.body.description,
       business_id: req.business._id,
-    });
-
+    }); 
+ 
     const details = await product.save();
     res.send({
       message: "Product saved successfully",
@@ -20,7 +21,7 @@ exports.create = async (req, res) => {
     });
   } catch (error) {
     res.status(500).send(error.message);
-  }
+  } 
 };
 exports.getProduct = async (req, res) => {
   await Product.find().then((product) => {
@@ -30,10 +31,20 @@ exports.getProduct = async (req, res) => {
     });
   });
 };
+exports.getProductById = async (req, res) => {
+  await Product.find({
+      business_id: req.query.business_id
+  }).then((product) => {
+    res.send({
+      message: "Products found are:",
+      product,
+    });
+  });
+};
 
 exports.getOneProduct = async (req, res, next) => {
   try {
-    const product = await Product.findOne({ _id: req.query.id });
+    const product = await Product.findById(req.query.id );
     if (!product) {
       res.status(404).send({
         message: "Product not found",
@@ -75,6 +86,7 @@ exports.updateProduct = async (req, res) => {
     name: req.body.name,
     price: req.body.price,
     price_level: req.body.price_level,
+    description: req.body.description,
     photo:response.secure_url,
   });
 
@@ -89,3 +101,27 @@ exports.updateProduct = async (req, res) => {
       res.status(400).send(error.message);
     });
 };
+
+exports.countProduct = async (req,res) => {
+  
+  await Product.find().count().then((data)=>{
+    
+    res.status(200).send({
+      message: "product found are:",
+      data,
+    });
+  }
+  )
+}
+exports.CountProductById = async(req, res) => {
+
+  await Product.find({
+      business_id: req.query.business_id
+  }).count().then((data) => {
+
+      res.status(200).send({
+          message: "product found are:",
+          data,
+      });
+  })
+}
