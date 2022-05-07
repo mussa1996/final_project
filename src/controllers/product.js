@@ -25,6 +25,12 @@ exports.create = async (req, res) => {
 };
 exports.getProduct = async (req, res) => {
   await Product.find().then((product) => {
+   product.map((product) => {
+     product._doc.id=product._id;
+     delete product._doc._id;
+     }
+     )
+     
     res.send({
       message: "Products found are:",
       product,
@@ -125,3 +131,4 @@ exports.CountProductById = async(req, res) => {
       });
   })
 }
+// function for payment 

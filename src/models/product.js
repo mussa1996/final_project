@@ -9,14 +9,14 @@ const productSchema = new mongoose.Schema({
     maxlength: 100,
   },
   price: {
-    type: String,
+    type: Number,
     required: true,
     trim: true,
     minlength: 1,
     maxlength: 100,
   },
   price_level: {
-    type: String,
+    type: Number,
     required: true,
     trim: true,
     minlength: 1,
@@ -37,7 +37,7 @@ const productSchema = new mongoose.Schema({
     type: mongoose.Schema.Types.ObjectId,
     ref: "business",
     required: true,
-  },
+  },   
 });
 const Product = mongoose.model("product",productSchema);
 module.exports = Product;

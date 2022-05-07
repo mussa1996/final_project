@@ -1,4 +1,5 @@
 import Business from "../models/business";
+import User from "../models/user";
 import Award from "../models/awards";
 import Service from "../models/internal_services";
 import Product from "../models/product";    
@@ -27,7 +28,8 @@ exports.createUser = async(req, res) => {
         website: req.body.website,
         latitude: req.body.latitude,
         longitude: req.body.longitude,
-        // role: req.body.role,  
+        rating: req.body.rating,
+        role: req.body.role,  
     });
    
         const data = await business.save();
@@ -40,30 +42,84 @@ exports.createUser = async(req, res) => {
             user: data,
             token: token,
         });
-        console.log(businessData);
+        
     } catch (error) {
         console.log(error.message);
         res.status(400).send({ message: "signup failed, try again!!!" }, error.message);
     }
 };  
 
-exports.loginUser = async(req, res) => {
+exports.loginUser = async(req, res,next) => {
     try {
-        const business = await Business.findByCredentials(
-            req.body.email,
-            req.body.password
-        );
-        const token = await business.generateAuthToken();
 
-        res.status(201).send({
-            message: "operation successful",
-            business,
-            token,  
-        });
+
+        if(req.body.role==="admin"){
+            const business = await Business.findByCredentials(
+                req.body.email,
+                req.body.password
+            );
+            if (business.role==="admin") {
+
+            const token=   await business.generateAuthToken();
+            return  res.status(201).send({
+                   message: "operation successful",
+                   business,
+                   token
+               });
+            }
+            else{
+                return res.status(401).send({
+                    message: "you are not authorized"
+                });
+            }
+        }
+            else if(req.body.role==="business"){
+                const business = await Business.findByCredentials(
+                    req.body.email,
+                    req.body.password
+                );
+                if (business.role==="business") {
+                    
+                const token=   await business.generateAuthToken();
+                return  res.status(201).send({
+
+                    message: "operation successful",
+                    business,
+                    token
+                });
+            }
+            else{
+                return res.status(401).send({
+                    message: "you are not authorized to login",
+                });
+            }
+        }
+            else if(req.body.role==="user"){
+                const user = await User.findByCredentials(
+                    req.body.email,
+                    req.body.password
+                );
+                const token=   await user.generateAuthToken();
+                return  res.status(201).send({
+                       message: "operation successful",
+                       user,
+                       token
+                   });
+            }
+            else{
+                return res.status(400).send({
+                    message: "invalid role"
+                })
+            }
     } catch (error) {
-        res.status(404).send(error.message);
+        return res.status(400).send({
+            message: "invalid credentials"
+        })
     }
 };
+
+
+        
 
 exports.updateUser = async(req, res) => {
     const images = req.files.photo;
@@ -74,14 +130,17 @@ exports.updateUser = async(req, res) => {
         name: req.body.name,
         owner_name: req.body.owner_name,
         address: req.body.address,
-        category: req.body.category,
+        // category: req.body.category,
         phone: req.body.phone, 
         // email: req.body.email,
-        password: req.body.password,
+        // password: req.body.password,
         photo: response.secure_url,
         website: req.body.website,
-        latitude: req.body.latitude,
-        longitude: req.body.longitude,
+        isVerified:{
+            default:true
+        }
+        // latitude: req.body.latitude,
+        // longitude: req.body.longitude,
         // role: req.body.role,
     });
     Business.updateOne({ _id: req.query.id }, business).then(() => {

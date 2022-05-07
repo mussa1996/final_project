@@ -59,7 +59,7 @@ const businessSchema = new mongoose.Schema({
     },
     website: {
         type: String,
-        required: true,
+        required: false,
     },
     latitude: {
         type: String,
@@ -71,7 +71,7 @@ const businessSchema = new mongoose.Schema({
     },
     rating: {
         type: Number, 
-        required: false, 
+        required: true, 
         default: 4.5,
     },
 
@@ -88,7 +88,8 @@ const businessSchema = new mongoose.Schema({
     role: {
         type: String,
         required: true,
-        default: "user",
+
+
     },
 });
 //generating auth token
