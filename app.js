@@ -4,6 +4,8 @@ import connectDb from './src/database/dbconnection';
 import cors from "cors";
 import routes from './src/routers/index';
 import fileupload from 'express-fileupload'
+const stripesecretkey = process.env.STRIPE_SECRET_KEY;
+const stripepublickey = process.env.STRIPE_PUBLIC_KEY;
 const app = express();
 connectDb(); 
 let corsOptions ={
