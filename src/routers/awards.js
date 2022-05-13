@@ -1,8 +1,8 @@
 import awardController from '../controllers/awards';
-import { userAuth } from '../middlewares/auth'
+import { businessAuth } from '../middlewares/auth'
 import express from 'express'
 const route = express.Router()
-route.post('/create',userAuth, awardController.create)
+route.post('/create',businessAuth, awardController.create)
 route.get('/getAll', awardController.getawards)
 route.get('/getOne/', awardController.getOneawards)
 route.put('/update/',awardController.updateawards)

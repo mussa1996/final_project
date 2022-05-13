@@ -14,13 +14,6 @@ const productSchema = new mongoose.Schema({
     trim: true,
     minlength: 1,
     maxlength: 100,
-  },
-  price_level: {
-    type: Number,
-    required: true,
-    trim: true,
-    minlength: 1,
-    maxlength: 100,
   }, 
   photo: {
     type: String,

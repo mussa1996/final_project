@@ -33,3 +33,24 @@ exports.payment = async (req, res) => {
   }
   res.json({ error, status });
 };
+exports.getPayment = async (req, res) => {
+  const payment = await Order.find();
+  res.json(payment);
+}
+exports.getPaymentById = async (req, res) => {
+  const payment = await Order.findById(req.query.id);
+  res.json(payment);
+}
+exports.getPaymentByBusinessId = async (req, res) => {
+  const payment = await Order.find({ business: req.query.id });
+  res.json(payment);
+}
+exports.getPaymentByUserId = async (req, res) => {
+  const payment = await Order.find({ user: req.query.id });
+  res.json(payment);
+}
+exports.deletePayment = async (req, res) => {
+  const payment = await Order.findByIdAndDelete(req.query.id);
+  res.json(payment);
+}
+ 

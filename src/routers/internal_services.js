@@ -1,8 +1,8 @@
 import serviceController from '../controllers/internal_services';
-import { userAuth } from '../middlewares/auth'
+import { businessAuth } from '../middlewares/auth'
 import express from 'express'
 const route = express.Router()
-route.post('/create',userAuth, serviceController.create)
+route.post('/create',businessAuth, serviceController.create)
 route.get('/getAll', serviceController.getinternal_services)
 route.get('/getOne/', serviceController.getOneinternal_services)
 route.put('/update/', serviceController.updateinternal_services)

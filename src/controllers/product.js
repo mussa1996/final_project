@@ -8,7 +8,6 @@ exports.create = async (req, res) => {
     const product = new Product({
       name: req.body.name,
       price: req.body.price,
-      price_level: req.body.price_level,
       photo:response.secure_url,
       description: req.body.description,
       business_id: req.business._id,
@@ -95,7 +94,6 @@ exports.updateProduct = async (req, res) => {
     _id: req.query.id,
     name: req.body.name,
     price: req.body.price,
-    price_level: req.body.price_level,
     description: req.body.description,
     photo:response.secure_url,
   });

@@ -1,8 +1,8 @@
 import productController from '../controllers/product';
-import { userAuth } from '../middlewares/auth'
+import { businessAuth } from '../middlewares/auth'
 import express from 'express'
 const route = express.Router()
-route.post('/create',userAuth, productController.create)
+route.post('/create',businessAuth, productController.create)
 route.get('/getAll',productController.getProduct)
 route.get('/getOne/', productController.getOneProduct)
 route.put('/update/', productController.updateProduct)
