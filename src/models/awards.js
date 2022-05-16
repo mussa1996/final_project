@@ -33,5 +33,6 @@ const awardsSchema = new mongoose.Schema({
         required: true,
       },
 });
+
 const Awards=mongoose.model("awards",awardsSchema);
 export default Awards;

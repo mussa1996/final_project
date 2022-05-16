@@ -17,7 +17,7 @@ exports.create = async (req, res) => {
   }
 };
 exports.getinternal_services = async (req, res) => {
-  await Internal_services.find().then((service) => {
+  await Internal_services.find().populate("business_id", "name").then((service) => {
     res.send({
       message: "internal_services found are:",
       service,
@@ -28,7 +28,7 @@ exports.getinternal_services = async (req, res) => {
 exports.getServiceById = async (req, res) => {
   await Internal_services.find({
       business_id: req.query.business_id
-  }).then((service) => {
+  }).populate("business_id", "name").then((service) => {
     res.send({
       message: "Services found are:",
       service,

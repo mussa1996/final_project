@@ -4,6 +4,7 @@ import connectDb from './src/database/dbconnection';
 import cors from "cors";
 import routes from './src/routers/index';
 import fileupload from 'express-fileupload'
+import dailyReportCron from './src/services/dailyCron'
 const stripesecretkey = process.env.STRIPE_SECRET_KEY;
 const stripepublickey = process.env.STRIPE_PUBLIC_KEY;
 const app = express();
@@ -17,6 +18,7 @@ app.use(bodyParser.json());
 app.use(cors(corsOptions));
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(fileupload({useTempFiles:true}))
+// dailyReportCron()
 app.use('/api', routes);
 app.get("/",(req, res) => {
   res.send("Smart City Project");

@@ -28,25 +28,25 @@ exports.payment = async (req, res) => {
     });
     status = 'success';
   } catch (error) { 
-    console.log(error);
-    status = 'Failure';
+    console.log(error); 
+    status = 'Failure'; 
   }
   res.json({ error, status });
 };
 exports.getPayment = async (req, res) => {
-  const payment = await Order.find();
+  const payment = await Order.find().populate("user", "fullname").populate("business", "name");
   res.json(payment);
 }
 exports.getPaymentById = async (req, res) => {
-  const payment = await Order.findById(req.query.id);
+  const payment = await Order.findById(req.query.id).populate("user", "fullname").populate("business", "name");
   res.json(payment);
 }
 exports.getPaymentByBusinessId = async (req, res) => {
-  const payment = await Order.find({ business: req.query.id });
+  const payment = await Order.find({ business: req.query.id }).populate("user", "fullname").populate("business", "name");
   res.json(payment);
 }
 exports.getPaymentByUserId = async (req, res) => {
-  const payment = await Order.find({ user: req.query.id });
+  const payment = await Order.find({ user: req.query.id }).populate("user", "fullname").populate("business", "name");
   res.json(payment);
 }
 exports.deletePayment = async (req, res) => {
