@@ -10,4 +10,5 @@ route.delete('/delete/', awardController.deleteawards)
 route.get('/count', awardController.countAward)
 route.get('/countById',awardController.CountAwardById)
 route.get('/getAwardById/',awardController.getAwardById)
+route.get('/getAllByCategory',awardController.findByCategory)
 module.exports = route

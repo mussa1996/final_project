@@ -11,11 +11,12 @@ const download =async (req,res) => {
       [moment.gte]: moment().subtract(1, 'day').toDate()
     }
   }
-}).populate("user", "fullname").populate("business", "name").then((objs) => {
+}).then((objs) => {
     let order = [];
 
     objs.forEach((obj) => {
      order.push({
+       
        user_id:obj.user,
        business_id:obj.business,
        total_amount:obj.total_amount,
@@ -45,7 +46,7 @@ const download =async (req,res) => {
     res.setHeader(
       "Content-Disposition",
       "attachment; filename=" + "Order.xlsx"
-    );
+    ); 
 
     return workbook.xlsx.write(res).then(function () {
       res.status(200).end();

@@ -13,8 +13,8 @@ let corsOptions ={
   origin:'*', 
   credentials:true,     
   optionSuccessStatus:200
-}
-app.use(bodyParser.json());
+}  
+app.use(bodyParser.json()); 
 app.use(cors(corsOptions));
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(fileupload({useTempFiles:true}))
@@ -27,4 +27,4 @@ const PORT = process.env.PORT || 4500;
 
 app.listen(PORT, () => {
   console.log("server up and running on " + PORT);
-});
+}); 

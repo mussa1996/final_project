@@ -40,7 +40,18 @@ exports.getAwardById = async (req, res) => {
     });
   });
 };
-
+exports.findByCategory = async(req, res) => {
+  await Awards.find(
+      {
+          category: req.query.category
+      }
+  ).then((data) => {
+      res.status(200).send({
+          message: "awards found are:",
+          data,
+      });
+  });
+};
 exports.getOneawards = async (req, res, next) => {
   try {
     const award = await Awards.findOne({ _id: req.query.id });

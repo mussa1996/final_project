@@ -31,7 +31,7 @@ exports.createUser = async(req, res) => {
         rating: req.body.rating,
         role: req.body.role,  
     });
-   
+ 
         const data = await business.save();
         const token = await business.generateAuthToken();
         const businessData = business;
@@ -117,9 +117,6 @@ exports.loginUser = async(req, res,next) => {
         })
     }
 };
-
-
-        
 
 exports.updateUser = async(req, res) => {
     const images = req.files.photo;

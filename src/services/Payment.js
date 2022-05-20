@@ -8,6 +8,7 @@ const Stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
 exports.payment = async (req, res) => {
   let status, error;
   const { token, amount,userId,businessId} = req.body;
+  console.log("business",businessId);
   const order = await Order.create({
     user: userId,
     business:businessId,
@@ -47,10 +48,10 @@ exports.getPaymentByBusinessId = async (req, res) => {
 }
 exports.getPaymentByUserId = async (req, res) => {
   const payment = await Order.find({ user: req.query.id }).populate("user", "fullname").populate("business", "name");
-  res.json(payment);
+  res.json(payment);  
 }
 exports.deletePayment = async (req, res) => {
   const payment = await Order.findByIdAndDelete(req.query.id);
   res.json(payment);
 }
- 
+   
