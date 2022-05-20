@@ -1,5 +1,6 @@
 import Awards from "../models/awards";
 import uploader from "../helper/storage";
+import Business from "../models/business";
 exports.create = async (req, res) => {
   try {
     const images=req.files.images;
@@ -14,10 +15,25 @@ exports.create = async (req, res) => {
      
     });
     const details = await awards.save();
-    res.send({
-      message: "awards saved successfully",
-      data: details,
-    });
+    
+    const businessId = req.query.businessId;
+    const findAllAwards = await Awards.find({business_id: businessId });
+    if(findAllAwards){
+      if(!findAllAwards){ throw new notFoundRequestError(("No reviews found, be the first to rate this business!"))}
+      
+      // get all award using loop 
+      const awards = findAllAwards.map(award => {
+          return {
+              "display_name": award.display_name,
+              "images":award.images,
+          }
+      })
+      Business.updateOne({_id: businessId}, {$set:{award:awards}}, function(err, res) {
+        if (err) throw err;
+      });
+
+      return res.status(200).json({status:200, awards: awards,details});
+  }
   } catch (error) {
     res.status(500).send(error.message);
   }
@@ -139,5 +155,38 @@ exports.CountAwardById = async(req, res) => {
           data,
       });
   })
+}
+
+exports.getAwardByBusiness = async (req, res, next) => {
+
+  const businessId = req.query.businessId;
+
+  try{
+
+
+
+      const findAllAwards = await Awards.find({business_id: businessId });
+      const findAllRatingsCount = await Awards.find({business_id: businessId }).count();
+      if(findAllAwards){
+          if(!findAllAwards){ throw new notFoundRequestError(("No reviews found, be the first to rate this business!"))}
+          
+          // get all award using loop 
+          const awards = findAllAwards.map(award => {
+              return {
+                  display_name: award.display_name,
+                  images:award.images,
+              }
+          })
+          
+
+          return res.status(200).json({status:200, awards: awards,number:findAllRatingsCount});
+      }
+      throw new ApplicationError(("Failed to load reviews, try again!"));
+  }
+  catch(error){
+      next(error);
+  }
+
+  
 }
 

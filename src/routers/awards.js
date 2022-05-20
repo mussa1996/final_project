@@ -11,4 +11,5 @@ route.get('/count', awardController.countAward)
 route.get('/countById',awardController.CountAwardById)
 route.get('/getAwardById/',awardController.getAwardById)
 route.get('/getAllByCategory',awardController.findByCategory)
+route.get('/getAwardByBusiness',awardController.getAwardByBusiness)
 module.exports = route

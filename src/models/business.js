@@ -55,7 +55,6 @@ const businessSchema = new mongoose.Schema({
     photo: {
         type: String,
         required: false,
-        default: "https://res.cloudinary.com/dzqbzqgqw/image/upload/v1599098981/default_business_profile_image_xqjqjy.png",
     },
     website: {
         type: String,
@@ -71,13 +70,19 @@ const businessSchema = new mongoose.Schema({
     },
     rating: {
         type: Number, 
-        required: true, 
-        default: 0,
+        required: false, 
     },
+    award:[ 
+        {
+            type:Object ,
+            required:false,
+ 
+        }],
+    
 
     isVerified: {
         type: Boolean,
-        default: false,
+        default: true,
     },
 
     token: {
