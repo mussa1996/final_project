@@ -23,7 +23,7 @@ exports.create = async (req, res) => {
   } 
 };
 exports.getProduct = async (req, res) => {
-  await Product.find().populate("business_id", "name").then((product) => {
+  await Product.find().then((product) => {
    product.map((product) => {
      product._doc.id=product._id;
      delete product._doc._id;

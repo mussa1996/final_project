@@ -39,7 +39,7 @@ exports.create = async (req, res) => {
   }
 };
 exports.getawards = async (req, res) => {
-  await Awards.find().populate("business_id", "name").then((award) => {
+  await Awards.find().then((award) => {
     res.send({
       message: "awards found are:",
       award,
